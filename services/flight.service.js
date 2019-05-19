@@ -9,7 +9,7 @@ export default class PromocodeService {
         return new Promise((resolve, reject) => {
             request.get(provider.url).set("X-API-Key", webservices.airApi.apiKey).timeout({
                 deadline: 30000, // allow 30 seconds for the file to finish loading.
-              }).then((res, err) => {
+              }).then( res => {
                 if (provider.name === "AIR_BEAM"){
                     const response = csvjson.toObject(res.res.text);
                     let newResponse = [];
@@ -25,17 +25,21 @@ export default class PromocodeService {
                     
                     for (let i = 0; i < res.body.length; i++){
                         const { id, price, atime: arrival_time, dtime : departure_time } = res.body[i];
+                       
                         newResponse.push(Object.assign({}, { id, price, departure_time, arrival_time}));
                     }
                     resolve({ name: provider.name, response: newResponse });
                 }else {
                     resolve({ name: provider.name, response: res.body });
                 }
-            }).catch(err => {
-                // ABORTED = Return if timeout
-                // if ((provider.name === "Air_JAZZ" && err.code === 502) || err.code === "ABORTED"){
-                    resolve({ name: provider.name, response: [] });
-                // }
+            }).catch( err => {
+                if (err.code === "ABORTED"){
+                    resolve({ name: provider.name, response: [], error: "timeout" });
+                }else if (provider.name === "Air_JAZZ" && err.code === 502){
+                    resolve({ name: provider.name, response: [], error: "HTTP 502 Bad Gateway" });
+                }else{
+                    reject(err);
+                }
             });
         });
     }
@@ -46,6 +50,7 @@ export default class PromocodeService {
         flightsInfo.forEach(flightsInfoDetail => {
             flightsInfoDetail.response.forEach(elem => {
                 const isAlreadyRegister = FlightsInfoResults ? FlightsInfoResults.filter(result => result.id === elem.id) : [];
+                
                 if ((!tmpLower || tmpLower >  parseFloat(elem.price)) && isAlreadyRegister.length === 0){
                     tmpLower = parseFloat(elem.price);
                     lowerFlightInfo = {
@@ -64,6 +69,7 @@ export default class PromocodeService {
     static ParseFlightsInfo(flightsInfo, FlightsInfoResults = []){
         if (FlightsInfoResults.length < 50){
             const lowerPriceDetail = this.getLowerPriceDetailPerName(flightsInfo, FlightsInfoResults);
+
             FlightsInfoResults.push(lowerPriceDetail);
             return this.ParseFlightsInfo(flightsInfo, FlightsInfoResults);
         } 
@@ -77,7 +83,6 @@ export default class PromocodeService {
             
             return response;
         } catch (err) {
-            console.error(err);
             return err;
         }
     }
