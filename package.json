@@ -1,0 +1,28 @@
+{
+  "name": "test_bcm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "author": "ldaubie",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "csvjson": "^5.1.0",
+    "dotenv": "^8.0.0",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.5.7",
+    "request": "^2.88.0",
+    "superagent": "^5.0.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/register": "^7.4.4",
+    "@babel/runtime": "^7.4.4"
+  }
+}
