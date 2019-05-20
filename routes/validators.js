@@ -1,7 +1,6 @@
-import jwt from 'jsonwebtoken';
-import config from '../config.js';
-import { RateLimiterMemory }  from 'rate-limiter-flexible';
 import config from '../config';
+import jwt from 'jsonwebtoken';
+import { RateLimiterMemory }  from 'rate-limiter-flexible';
 
 const rateLimiter = new RateLimiterMemory(
     {
